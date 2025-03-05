@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import {SwaggerModule,DocumentBuilder} from '@nestjs/swagger'
 import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -11,6 +12,12 @@ async function bootstrap() {
                 .build();
   const documentFactory = () => SwaggerModule.createDocument(app,config);
   SwaggerModule.setup('api',app,documentFactory);
+  // Validation pipe
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true     // remove unknown properties(ading new properties to the request)
+    })
+  );
   app.enableCors();
   await app.listen(process.env.PORT ?? 3003);
   console.log(`Application is running on: ${await app.getUrl()}`);
